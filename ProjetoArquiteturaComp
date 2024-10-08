@@ -1,1 +1,48 @@
+ORG 0000H
+
+; Definições de portas e pinos
+LED_VERDE   EQU P3.0        ; LED verde para senha correta
+LED_VERMELHO EQU P3.1       ; LED vermelho para senha incorreta
+
+LINHAS      EQU P2          ; Linhas do teclado (P2.0 - P2.3)
+COLUNAS     EQU P2          ; Colunas do teclado (P2.4 - P2.6)
+
+PASSWORD0   EQU 50H         ; Primeiro dígito da senha
+PASSWORD1   EQU 51H         ; Segundo dígito da senha
+PASSWORD2   EQU 52H         ; Terceiro dígito da senha
+PASSWORD3   EQU 53H         ; Quarto dígito da senha
+
+; Senha correta definida como "1234"
+MOV PASSWORD0, #'1'
+MOV PASSWORD1, #'2'
+MOV PASSWORD2, #'3'
+MOV PASSWORD3, #'4'
+
+; Configurações iniciais
+MOV R0, #50H          ; Apontador para armazenar os dígitos inseridos
+MOV R5, #00H          ; Contador de dígitos corretos
+
+; Loop principal
+MAIN:
+    ; Varredura do teclado
+SCAN_KEYPAD:
+    ACALL SCAN_LINHAS      ; Varre as linhas do teclado
+    CJNE A, #00H, PROCESS_KEY ; Se um botão foi pressionado, processa a tecla
+    SJMP SCAN_KEYPAD_HOLD   ; Continua varrendo até uma tecla ser pressionada
+
+SCAN_KEYPAD_HOLD:
+    MOV A, COLUNAS
+    ANL A, #0F0H           ; Mantém a tecla pressionada até ser liberada
+    CJNE A, #0F0H, SCAN_KEYPAD_HOLD
+    SJMP SCAN_KEYPAD       ; Continua varrendo até uma tecla ser pressionada
+
+PROCESS_KEY:
+    ACALL DEBOUNCE         ; Debounce para evitar leituras incorretas
+    MOV B, @R0             ; Lê o dígito da senha esperada
+    INC R0                 ; Aponta para o próximo dígito da senha
+
+    ; Comparar com o dígito esperado
+COMPARE:
+    CJNE A, B, DIFFERENT   ; Se diferente, pula para "DIFFERENT"
+    INC R5                 ; Se igual, incrementa o contador de acertos
 
