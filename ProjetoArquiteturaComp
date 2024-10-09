@@ -71,3 +71,20 @@ WAIT_RELEASE:
     ANL A, #0F0H           ; Aguarda todas as teclas serem liberadas
     CJNE A, #0F0H, WAIT_RELEASE
     SJMP MAIN              ; Reinicia o processo
+; Sub-rotinas adicionais
+; Varre as linhas do teclado
+SCAN_LINHAS:
+    MOV A, #0FEH           ; Ativa a primeira linha (P2.0)
+    MOV LINHAS, A
+    ACALL CHECK_COLUNAS
+    JNZ SCAN_DONE
+
+    MOV A, #0FDH           ; Ativa a segunda linha (P2.1)
+    MOV LINHAS, A
+    ACALL CHECK_COLUNAS
+    JNZ SCAN_DONE
+
+    MOV A, #0FBH           ; Ativa a terceira linha (P2.2)
+    MOV LINHAS, A
+    ACALL CHECK_COLUNAS
+    JNZ SCAN_DONE
