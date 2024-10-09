@@ -102,4 +102,12 @@ CHECK_COLUNAS:
 KEY_FOUND:
     MOV A, COLUNAS
     RET
+; Rotina de debounce para estabilizar a leitura do teclado
+DEBOUNCE:
+    MOV R7, #50            ; Delay simples para debounce
+DELAY_LOOP:
+    DJNZ R7, DELAY_LOOP
+    RET
+
+END
 
