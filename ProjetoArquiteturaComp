@@ -88,3 +88,18 @@ SCAN_LINHAS:
     MOV LINHAS, A
     ACALL CHECK_COLUNAS
     JNZ SCAN_DONE
+ MOV A, #00H            ; Nenhuma tecla pressionada
+SCAN_DONE:
+    RET
+
+CHECK_COLUNAS:
+    MOV A, COLUNAS
+    ANL A, #0F0H           ; Mascara para verificar colunas
+    CJNE A, #0F0H, KEY_FOUND ; Se uma coluna estiver baixa, tecla foi pressionada
+    MOV A, #00H            ; Nenhuma tecla pressionada
+    RET
+
+KEY_FOUND:
+    MOV A, COLUNAS
+    RET
+
