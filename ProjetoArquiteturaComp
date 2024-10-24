@@ -1,113 +1,38 @@
 ORG 0000H
 
-; Definições de portas e pinos
-LED_VERDE   EQU P3.0        ; LED verde para senha correta
-LED_VERMELHO EQU P3.1       ; LED vermelho para senha incorreta
-
-LINHAS      EQU P2          ; Linhas do teclado (P2.0 - P2.3)
-COLUNAS     EQU P2          ; Colunas do teclado (P2.4 - P2.6)
-
-PASSWORD0   EQU 50H         ; Primeiro dígito da senha
-PASSWORD1   EQU 51H         ; Segundo dígito da senha
-PASSWORD2   EQU 52H         ; Terceiro dígito da senha
-PASSWORD3   EQU 53H         ; Quarto dígito da senha
-
-; Senha correta definida como "1234"
-MOV PASSWORD0, #'1'
-MOV PASSWORD1, #'2'
-MOV PASSWORD2, #'3'
-MOV PASSWORD3, #'4'
-
-; Configurações iniciais
-MOV R0, #50H          ; Apontador para armazenar os dígitos inseridos
-MOV R5, #00H          ; Contador de dígitos corretos
+; Inicialização
+INIT:
+    MOV P1, #0xFF        ; Desliga todos os LEDs (P1 = 0xFF)
+    MOV P0, #0xF0        ; Configura as colunas (P0.6, P0.5, P0.4) como saída e as linhas (P0.3 - P0.0) como entrada
+    LJMP MAIN            ; Salta para o loop principal
 
 ; Loop principal
 MAIN:
-    ; Varredura do teclado
-SCAN_KEYPAD:
-    ACALL SCAN_LINHAS      ; Varre as linhas do teclado
-    CJNE A, #00H, PROCESS_KEY ; Se um botão foi pressionado, processa a tecla
-    SJMP SCAN_KEYPAD_HOLD   ; Continua varrendo até uma tecla ser pressionada
+    ACALL CHECK_KEY      ; Chama a sub-rotina para verificar teclas pressionadas
+    LJMP MAIN            ; Volta para o loop principal
 
-SCAN_KEYPAD_HOLD:
-    MOV A, COLUNAS
-    ANL A, #0F0H           ; Mantém a tecla pressionada até ser liberada
-    CJNE A, #0F0H, SCAN_KEYPAD_HOLD
-    SJMP SCAN_KEYPAD       ; Continua varrendo até uma tecla ser pressionada
+; Sub-rotina para verificar teclas pressionadas
+CHECK_KEY:
+    ; Varredura da primeira coluna (P0.6 = 0)
+    MOV A, #0xBF         ; Coloca P0.6 em 0 (ativa a primeira coluna) e mantém as outras colunas em 1
+    MOV P0, A
+    MOV A, P0            ; Lê as linhas (P0.3 - P0.0)
+    ANL A, #0x0F         ; Isola as linhas (P0.3 - P0.0)
+    CJNE A, #0x0F, COL1_CHECK ; Se houver uma linha ativa, vai para COL1_CHECK
 
-PROCESS_KEY:
-    ACALL DEBOUNCE         ; Debounce para evitar leituras incorretas
-    MOV B, @R0             ; Lê o dígito da senha esperada
-    INC R0                 ; Aponta para o próximo dígito da senha
+    ; Varredura da segunda coluna (P0.5 = 0)
+    MOV A, #0xDF         ; Coloca P0.5 em 0 (ativa a segunda coluna)
+    MOV P0, A
+    MOV A, P0
+    ANL A, #0x0F
+    CJNE A, #0x0F, COL2_CHECK ; Se houver uma linha ativa, vai para COL2_CHECK
 
-    ; Comparar com o dígito esperado
-COMPARE:
-    CJNE A, B, DIFFERENT   ; Se diferente, pula para "DIFFERENT"
-    INC R5                 ; Se igual, incrementa o contador de acertos
+    ; Varredura da terceira coluna (P0.4 = 0)
+    MOV A, #0xEF         ; Coloca P0.4 em 0 (ativa a terceira coluna)
+    MOV P0, A
+    MOV A, P0
+    ANL A, #0x0F
+    CJNE A, #0x0F, COL3_CHECK ; Se houver uma linha ativa, vai para COL3_CHECK
 
-DIFFERENT:
-    CJNE R0, #54H, SCAN_KEYPAD ; Verifica se todos os dígitos foram lidos
-    MOV R0, #50H           ; Zera o apontador para reiniciar a leitura
-
-    ; Verifica se a senha está correta
-STATUS:
-    CJNE R5, #04H, WRONG   ; Se R5 é diferente de 4, a senha está errada
-
-RIGHT:
-    MOV R5, #00H           ; Zera o contador de acertos
-    SETB LED_VERDE         ; Acende o LED verde
-    CLR LED_VERMELHO       ; Apaga o LED vermelho
-    SJMP WAIT_RELEASE      ; Aguarda a tecla ser liberada antes de continuar
-
-WRONG:
-    MOV R5, #00H           ; Zera o contador de acertos
-    CLR LED_VERDE          ; Apaga o LED verde
-    SETB LED_VERMELHO      ; Acende o LED vermelho
-    SJMP WAIT_RELEASE      ; Aguarda a tecla ser liberada antes de continuar
-
-WAIT_RELEASE:
-    MOV A, COLUNAS
-    ANL A, #0F0H           ; Aguarda todas as teclas serem liberadas
-    CJNE A, #0F0H, WAIT_RELEASE
-    SJMP MAIN              ; Reinicia o processo
-; Sub-rotinas adicionais
-; Varre as linhas do teclado
-SCAN_LINHAS:
-    MOV A, #0FEH           ; Ativa a primeira linha (P2.0)
-    MOV LINHAS, A
-    ACALL CHECK_COLUNAS
-    JNZ SCAN_DONE
-
-    MOV A, #0FDH           ; Ativa a segunda linha (P2.1)
-    MOV LINHAS, A
-    ACALL CHECK_COLUNAS
-    JNZ SCAN_DONE
-
-    MOV A, #0FBH           ; Ativa a terceira linha (P2.2)
-    MOV LINHAS, A
-    ACALL CHECK_COLUNAS
-    JNZ SCAN_DONE
- MOV A, #00H            ; Nenhuma tecla pressionada
-SCAN_DONE:
-    RET
-
-CHECK_COLUNAS:
-    MOV A, COLUNAS
-    ANL A, #0F0H           ; Mascara para verificar colunas
-    CJNE A, #0F0H, KEY_FOUND ; Se uma coluna estiver baixa, tecla foi pressionada
-    MOV A, #00H            ; Nenhuma tecla pressionada
-    RET
-
-KEY_FOUND:
-    MOV A, COLUNAS
-    RET
-; Rotina de debounce para estabilizar a leitura do teclado
-DEBOUNCE:
-    MOV R7, #50            ; Delay simples para debounce
-DELAY_LOOP:
-    DJNZ R7, DELAY_LOOP
-    RET
-
-END
-
+    ; Nenhuma tecla foi pressionada
+    RET                  ; Retorna ao loop principal
