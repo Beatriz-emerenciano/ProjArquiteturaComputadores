@@ -36,3 +36,39 @@ CHECK_KEY:
 
     ; Nenhuma tecla foi pressionada
     RET                  ; Retorna ao loop principal
+COL1_CHECK:
+    ; Verifica qual linha foi ativada na primeira coluna
+    CJNE A, #0x0E, KEY_1 ; Tecla '1'
+    CJNE A, #0x0D, KEY_2 ; Tecla '2'
+    CJNE A, #0x0B, KEY_3 ; Tecla '3'
+    CJNE A, #0x07, KEY_STAR ; Tecla '*'
+    RET
+
+COL2_CHECK:
+    ; Verifica qual linha foi ativada na segunda coluna
+    CJNE A, #0x0E, KEY_4 ; Tecla '4'
+    CJNE A, #0x0D, KEY_5 ; Tecla '5'
+    CJNE A, #0x0B, KEY_6 ; Tecla '6'
+    CJNE A, #0x07, KEY_0 ; Tecla '0'
+    RET
+
+COL3_CHECK:
+    ; Verifica qual linha foi ativada na terceira coluna
+    CJNE A, #0x0E, KEY_7 ; Tecla '7'
+    CJNE A, #0x0D, KEY_8 ; Tecla '8'
+    CJNE A, #0x0B, KEY_9 ; Tecla '9'
+    CJNE A, #0x07, KEY_HASH ; Tecla '#'
+    RET
+
+; Aqui tratamos cada tecla pressionada
+KEY_0:
+    CLR P1.0             ; Apaga o bit P1.0 (acende o LED no pino P1.0)
+    ACALL WAIT           ; Espera enquanto a tecla está pressionada
+    SETB P1.0            ; Mantém o LED aceso
+    RET
+
+KEY_1:
+    CLR P1.1             ; Apaga o bit P1.1 (acende o LED no pino P1.1)
+    ACALL WAIT           ; Espera enquanto a tecla está pressionada
+    SETB P1.1            ; Mantém o LED aceso
+    RET
