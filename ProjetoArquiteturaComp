@@ -104,6 +104,12 @@ KEY_7:
     ACALL WAIT           ; Espera enquanto a tecla está pressionada
     SETB P1.7            ; Mantém o LED aceso
     RET
+KEY_8:
+    CLR P1.0             ; Apaga o bit P1.0 (acende o LED no pino P1.0)
+    ACALL WAIT           ; Espera enquanto a tecla está pressionada
+    SETB P1.0            ; Mantém o LED aceso
+    RET
+
 
 
 
