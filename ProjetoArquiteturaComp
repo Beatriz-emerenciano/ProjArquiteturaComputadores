@@ -114,6 +114,38 @@ KEY_9:
     ACALL WAIT           ; Espera enquanto a tecla está pressionada
     SETB P1.1            ; Mantém o LED aceso
     RET
+KEY_STAR:
+    CLR P1.2             ; Apaga o bit P1.2 (acende o LED no pino P1.2)
+    ACALL WAIT           ; Espera enquanto a tecla está pressionada
+    SETB P1.2            ; Mantém o LED aceso
+    RET
+
+KEY_HASH:
+    CLR P1.3             ; Apaga o bit P1.3 (acende o LED no pino P1.3)
+    ACALL WAIT           ; Espera enquanto a tecla está pressionada
+    SETB P1.3            ; Mantém o LED aceso
+    RET
+
+NO_KEY:
+    RET                  ; Retorna se nenhuma tecla for pressionada
+
+; Procedimento para esperar
+WAIT:
+    MOV A, P0            ; Lê o estado do teclado
+    ANL A, #0x0F         ; Isola as linhas (P0.3 - P0.0)
+    CJNE A, #0x0F, WAIT  ; Aguarda enquanto a tecla estiver pressionada
+    RET                  ; Retorna quando a tecla for solta
+
+; Delay simples
+DELAY:
+    MOV R2, #0FFH
+DELAY_LOOP:
+    DJNZ R2, DELAY_LOOP
+    RET
+
+END
+
+
 
 
 
