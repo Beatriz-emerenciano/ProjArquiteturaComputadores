@@ -83,5 +83,11 @@ KEY_3:
     SETB P1.3            ; Mantém o LED aceso
     RET
 
+KEY_4:
+    CLR P1.4             ; Apaga o bit P1.4 (acende o LED no pino P1.4)
+    ACALL WAIT           ; Espera enquanto a tecla está pressionada
+    SETB P1.4            ; Mantém o LED aceso
+    RET
+
 
 
