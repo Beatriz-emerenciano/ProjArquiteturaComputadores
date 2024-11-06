@@ -202,4 +202,90 @@ Tecla12:
     SETB F0            
     Mov R7,#'5'        
     RET                
+Tecla22:
+    SETB F0            
+    Mov R7,#'4'        
+    RET                
 
+LerLinha2:
+    JNB P0.4, Tecla01    
+    JNB P0.5, Tecla11    
+    JNB P0.6, Tecla21    
+    RET                    
+
+Tecla01:
+    SETB F0            
+    Mov R7,#'9'        
+    RET                
+
+Tecla11:
+    SETB F0            
+    Mov R7,#'8'        
+    RET                
+
+Tecla21:
+    SETB F0            
+    Mov R7,#'7'        
+    RET                
+
+LerLinha3:
+    JNB P0.4, Tecla00    
+    JNB P0.5, Tecla10    
+    JNB P0.6, Tecla20    
+    RET                    
+
+Tecla00:
+    SETB F0            
+    Mov R7,#'#'        
+    RET                
+
+Tecla10:
+    SETB F0            
+    Mov R7,#'0'        
+    RET                
+
+Tecla20:
+    SETB F0            
+    Mov R7,#'@'        
+    RET        
+
+ValidarEntrada:    
+    Cjne A,07H,SairValidacao    
+    Inc R5
+SairValidacao:                    
+    Ret
+
+PosicionarCursor:    
+    Clr REGISTRADOR_SELECT
+    SetB P1.7        
+    SetB P1.6        
+    Clr P1.5                                             
+    Clr P1.4                                             
+    Call AtivarPino
+    Clr P1.7                                             
+    Clr P1.6                                             
+    Clr P1.5                                             
+    Clr P1.4                                             
+    Call AtivarPino
+    Call Esperar            
+    Ret    
+
+MostrarPermitido:    
+    Mov DPTR,#MensagemPermitido        
+LoopPermitido:    
+    Clr A
+    Movc A,@A+DPTR
+    Jz VoltarInicio
+    Call EnviarCaractere
+    Inc DPTR
+    Jmp LoopPermitido        
+
+MostrarNegado:        
+    Mov DPTR,#MensagemNegado        
+LoopNegado:    
+    Clr A
+    Movc A,@A+DPTR
+    Jz VoltarInicio
+    Call EnviarCaractere
+    Inc DPTR    
+    Jmp LoopNegado
