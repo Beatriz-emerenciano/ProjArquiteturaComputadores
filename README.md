@@ -27,19 +27,19 @@ Utilizando um teclado matricial para inserção do PIN e um display LCD para exi
 - Teclado Matricial 4x4
 - Display LCD
 
-** Para simular todos os perifericos do projeto, foi utilizado no emulador Edsim51.**
+**Para simular todos os perifericos do projeto, foi utilizado no emulador Edsim51.**
 
 # Execução do Projeto
 
-** Frequência Recomendada para Testes: **
+**Frequência Recomendada para Testes:**
 
 - Utilize uma frequência de 100 Hz para a exibição inicial das mensagens.
 - Antes de inserir dados no teclado, ajuste a frequência para 10 Hz.
 - Frequências mais altas podem causar problemas de múltiplas entradas no teclado matricial.
 
- ** Processo Quando o PIN é Solicitado: ** 
+ **Processo Quando o PIN é Solicitado:** 
 
-A função principal (Main) é iniciada.
+- A função principal (Main) é iniciada.
 - Chama-se a função ExibirDisplay para mostrar a mensagem "Digite o PIN:" no LCD.
 - O loop Novamente percorre os caracteres da mensagem para apresentá-los na tela.
 - A função ScanTeclado entra em ação para aguardar a entrada do PIN pelo usuário.
@@ -47,7 +47,7 @@ A função principal (Main) é iniciada.
 - Se o PIN for válido, a função Concedido exibe "Acesso Concedido".
 - Se o PIN for inválido, a função Negado exibe "Acesso Negado".
 
-** Quando o PIN Correto é Inserido: **
+**Quando o PIN Correto é Inserido:**
 
 - A cada tecla pressionada, a função VerificarEntrada confirma se o dígito corresponde ao esperado.
 -Se todos os dígitos estiverem corretos, a função Concedido é acionada para permitir o acesso.
@@ -55,7 +55,7 @@ A função principal (Main) é iniciada.
 - Um temporizador é iniciado para controlar o tempo necessário para meia volta do motor.
 - Ao final do temporizador, o programa desativa o pino P3.0, interrompendo o movimento do motor.
 
-**Quando o PIN Incorreto é Inserido: **
+**Quando o PIN Incorreto é Inserido:**
 
 - A função VerificarEntrada verifica cada tecla pressionada em busca de inconsistências.
 - Se algum dígito não corresponder, a função Negado é chamada para negar o acesso e informar o usuário.
