@@ -43,12 +43,12 @@ Utilizando um teclado matricial para inserção do PIN e um display LCD para exi
  **Processo Quando o PIN é Solicitado:** 
 
 - A função principal (Main) é iniciada.
-- Chama-se a função ExibirDisplay para mostrar a mensagem "Digite o PIN:" no LCD.
+- Chama-se a função ExibirDisplay para mostrar a mensagem "DIGITE:" no LCD.
 - O loop Novamente percorre os caracteres da mensagem para apresentá-los na tela.
 - A função ScanTeclado entra em ação para aguardar a entrada do PIN pelo usuário.
 - Após a digitação do PIN, o programa utiliza a função VerificarEntrada para conferir se a senha está correta.
-- Se o PIN for válido, a função Concedido exibe "Acesso Concedido".
-- Se o PIN for inválido, a função Negado exibe "Acesso Negado".
+- Se o PIN for válido, a função Concedido exibe "COFRE ABERTO".
+- Se o PIN for inválido, a função Negado exibe "COFRE FECHADO".
 
 **Quando o PIN Correto é Inserido:**
 
