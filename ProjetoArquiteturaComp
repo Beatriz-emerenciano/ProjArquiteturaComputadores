@@ -1,153 +1,138 @@
 ORG 0000H
 
-; Inicialização
-INIT:
-    MOV P1, #0xFF        ; Desliga todos os LEDs (P1 = 0xFF)
-    MOV P0, #0xF0        ; Configura as colunas (P0.6, P0.5, P0.4) como saída e as linhas (P0.3 - P0.0) como entrada
-    LJMP MAIN            ; Salta para o loop principal
+; Definições dos pinos
+REGISTRADOR_SELECT    EQU    P1.3
+PINO_ATIVAR           EQU    P1.2
 
-; Loop principal
-MAIN:
-    ACALL CHECK_KEY      ; Chama a sub-rotina para verificar teclas pressionadas
-    LJMP MAIN            ; Volta para o loop principal
+InicioProg:
+    Clr REGISTRADOR_SELECT        
+    Call InicializarTela    
+    Call ConfigurarTela    
+    Call ConfigEntrada        
+    SetB REGISTRADOR_SELECT        
+    Mov DPTR,#TabelaMensagens
+    
+LoopPrincipal:
+    Clr A
+    Movc A,@A+DPTR    
+    Jz ProximaSecao        
+    Call EnviarCaractere    
+    Inc DPTR        
+    Jmp LoopPrincipal
 
-; Sub-rotina para verificar teclas pressionadas
-CHECK_KEY:
-    ; Varredura da primeira coluna (P0.6 = 0)
-    MOV A, #0xBF         ; Coloca P0.6 em 0 (ativa a primeira coluna) e mantém as outras colunas em 1
-    MOV P0, A
-    MOV A, P0            ; Lê as linhas (P0.3 - P0.0)
-    ANL A, #0x0F         ; Isola as linhas (P0.3 - P0.0)
-    CJNE A, #0x0F, COL1_CHECK ; Se houver uma linha ativa, vai para COL1_CHECK
+ProximaSecao:
+    Mov R4,#00h    
+    Mov R5,#00h    
+    Mov DPTR,#CodigoSeguro    
 
-    ; Varredura da segunda coluna (P0.5 = 0)
-    MOV A, #0xDF         ; Coloca P0.5 em 0 (ativa a segunda coluna)
-    MOV P0, A
-    MOV A, P0
-    ANL A, #0x0F
-    CJNE A, #0x0F, COL2_CHECK ; Se houver uma linha ativa, vai para COL2_CHECK
+LoopEntrada:
+    Call LerTeclado    
+    SetB REGISTRADOR_SELECT        
+    Clr A
+    Mov A,#'@'        
+    Call EnviarCaractere    
+    
+    Clr A
+    Movc A,@A+DPTR    
+    Call ValidarEntrada    
+    Inc DPTR
+    Inc R4
+    Cjne R4,#04h,LoopEntrada
+    
+    Cjne R5,#04h,AcessoNegado    
 
-    ; Varredura da terceira coluna (P0.4 = 0)
-    MOV A, #0xEF         ; Coloca P0.4 em 0 (ativa a terceira coluna)
-    MOV P0, A
-    MOV A, P0
-    ANL A, #0x0F
-    CJNE A, #0x0F, COL3_CHECK ; Se houver uma linha ativa, vai para COL3_CHECK
+AcessoPermitido:
+    Call PosicionarCursor
+    SetB REGISTRADOR_SELECT        
+    Call MostrarPermitido
+    SETB P3.0 
+    CLR P3.1 
+    
+    MOV R6, #0 
+    MOV R7, #200      
+    
+ContadorTempo:
+    DJNZ R7, ContadorTempo 
+    CLR P3.0 
+    Jmp ProximaSecao
 
-    ; Nenhuma tecla foi pressionada
-    RET                  ; Retorna ao loop principal
-COL1_CHECK:
-    ; Verifica qual linha foi ativada na primeira coluna
-    CJNE A, #0x0E, KEY_1 ; Tecla '1'
-    CJNE A, #0x0D, KEY_2 ; Tecla '2'
-    CJNE A, #0x0B, KEY_3 ; Tecla '3'
-    CJNE A, #0x07, KEY_STAR ; Tecla '*'
-    RET
+AcessoNegado:
+    Call PosicionarCursor
+    SetB REGISTRADOR_SELECT        
+    Call MostrarNegado
+    Jmp ProximaSecao
+                
+InicializarTela:
+    Clr  P1.7        
+    Clr  P1.6        
+    SetB P1.5        
+    Clr  P1.4    
+    
+    Call AtivarPino
+    Call Esperar        
+    Call AtivarPino
+                    
+    SetB P1.7        
+    Clr  P1.6
+    Clr  P1.5
+    Clr  P1.4
+        
+    Call AtivarPino
+    Call Esperar
+    Ret
 
-COL2_CHECK:
-    ; Verifica qual linha foi ativada na segunda coluna
-    CJNE A, #0x0E, KEY_4 ; Tecla '4'
-    CJNE A, #0x0D, KEY_5 ; Tecla '5'
-    CJNE A, #0x0B, KEY_6 ; Tecla '6'
-    CJNE A, #0x07, KEY_0 ; Tecla '0'
-    RET
+ConfigurarTela:
+    Clr P1.7        
+    Clr P1.6        
+    Clr P1.5        
+    Clr P1.4      
+    Call AtivarPino
+    SetB P1.7        
+    SetB P1.6        
+    SetB P1.5        
+    SetB P1.4        
+    Call AtivarPino
+    Call Esperar            
+    Ret
 
-COL3_CHECK:
-    ; Verifica qual linha foi ativada na terceira coluna
-    CJNE A, #0x0E, KEY_7 ; Tecla '7'
-    CJNE A, #0x0D, KEY_8 ; Tecla '8'
-    CJNE A, #0x0B, KEY_9 ; Tecla '9'
-    CJNE A, #0x07, KEY_HASH ; Tecla '#'
-    RET
-
-; Aqui tratamos cada tecla pressionada
-KEY_0:
-    CLR P1.0             ; Apaga o bit P1.0 (acende o LED no pino P1.0)
-    ACALL WAIT           ; Espera enquanto a tecla está pressionada
-    SETB P1.0            ; Mantém o LED aceso
-    RET
-
-KEY_1:
-    CLR P1.1             ; Apaga o bit P1.1 (acende o LED no pino P1.1)
-    ACALL WAIT           ; Espera enquanto a tecla está pressionada
-    SETB P1.1            ; Mantém o LED aceso
-    RET
-KEY_2:
-    CLR P1.2             ; Apaga o bit P1.2 (acende o LED no pino P1.2)
-    ACALL WAIT           ; Espera enquanto a tecla está pressionada
-    SETB P1.2            ; Mantém o LED aceso
-    RET
-KEY_3:
-    CLR P1.3             ; Apaga o bit P1.3 (acende o LED no pino P1.3)
-    ACALL WAIT           ; Espera enquanto a tecla está pressionada
-    SETB P1.3            ; Mantém o LED aceso
-    RET
-
-KEY_4:
-    CLR P1.4             ; Apaga o bit P1.4 (acende o LED no pino P1.4)
-    ACALL WAIT           ; Espera enquanto a tecla está pressionada
-    SETB P1.4            ; Mantém o LED aceso
-    RET
-KEY_5:
-    CLR P1.5             ; Apaga o bit P1.5 (acende o LED no pino P1.5)
-    ACALL WAIT           ; Espera enquanto a tecla está pressionada
-    SETB P1.5            ; Mantém o LED aceso
-    RET
-
-KEY_6:
-    CLR P1.6             ; Apaga o bit P1.6 (acende o LED no pino P1.6)
-    ACALL WAIT           ; Espera enquanto a tecla está pressionada
-    SETB P1.6            ; Mantém o LED aceso
-    RET
-KEY_7:
-    CLR P1.7             ; Apaga o bit P1.7 (acende o LED no pino P1.7)
-    ACALL WAIT           ; Espera enquanto a tecla está pressionada
-    SETB P1.7            ; Mantém o LED aceso
-    RET
-KEY_8:
-    CLR P1.0             ; Apaga o bit P1.0 (acende o LED no pino P1.0)
-    ACALL WAIT           ; Espera enquanto a tecla está pressionada
-    SETB P1.0            ; Mantém o LED aceso
-    RET
-KEY_9:
-    CLR P1.1             ; Apaga o bit P1.1 (acende o LED no pino P1.1)
-    ACALL WAIT           ; Espera enquanto a tecla está pressionada
-    SETB P1.1            ; Mantém o LED aceso
-    RET
-KEY_STAR:
-    CLR P1.2             ; Apaga o bit P1.2 (acende o LED no pino P1.2)
-    ACALL WAIT           ; Espera enquanto a tecla está pressionada
-    SETB P1.2            ; Mantém o LED aceso
-    RET
-
-KEY_HASH:
-    CLR P1.3             ; Apaga o bit P1.3 (acende o LED no pino P1.3)
-    ACALL WAIT           ; Espera enquanto a tecla está pressionada
-    SETB P1.3            ; Mantém o LED aceso
-    RET
-
-NO_KEY:
-    RET                  ; Retorna se nenhuma tecla for pressionada
-
-; Procedimento para esperar
-WAIT:
-    MOV A, P0            ; Lê o estado do teclado
-    ANL A, #0x0F         ; Isola as linhas (P0.3 - P0.0)
-    CJNE A, #0x0F, WAIT  ; Aguarda enquanto a tecla estiver pressionada
-    RET                  ; Retorna quando a tecla for solta
-
-; Delay simples
-DELAY:
-    MOV R2, #0FFH
-DELAY_LOOP:
-    DJNZ R2, DELAY_LOOP
-    RET
-
-END
-
-
-
-
-
-
-
+ConfigEntrada:
+    Clr P1.7        
+    Clr P1.6        
+    Clr P1.5        
+    Clr P1.4        
+    Call AtivarPino
+    Clr  P1.7        
+    SetB P1.6        
+    SetB P1.5        
+    Clr  P1.4        
+    Call AtivarPino
+    Call Esperar        
+    Ret
+    
+AtivarPino:
+    SetB PINO_ATIVAR        
+    Clr  PINO_ATIVAR        
+    Ret
+    
+EnviarCaractere:
+    Mov C, ACC.7        
+    Mov P1.7, C        
+    Mov C, ACC.6        
+    Mov P1.6, C        
+    Mov C, ACC.5        
+    Mov P1.5, C        
+    Mov C, ACC.4        
+    Mov P1.4, C        
+    Call AtivarPino
+    Mov C, ACC.3        
+    Mov P1.7, C        
+    Mov C, ACC.2        
+    Mov P1.6, C        
+    Mov C, ACC.1        
+    Mov P1.5, C        
+    Mov C, ACC.0        
+    Mov P1.4, C        
+    Call AtivarPino
+    Call Esperar        
+    Mov R1,#45h        
+    Ret
