@@ -289,3 +289,13 @@ LoopNegado:
     Call EnviarCaractere
     Inc DPTR    
     Jmp LoopNegado
+VoltarInicio:    
+    Ret    
+
+; Mensagens corrigidas
+TabelaMensagens:     DB 'D','I','G','I','T','E',':',0
+MensagemPermitido:   DB 'C','O','F','R','E',' ','A','B','E','R','T','O','!',0
+MensagemNegado:      DB 'C','O','F','R','E',' ','F','E','C','H','A','D','O','!',0
+CodigoSeguro:        DB '4','5','7','2',0    ; Senha: 4572
+
+End
