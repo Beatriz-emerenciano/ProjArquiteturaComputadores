@@ -1,304 +1,309 @@
-ORG 0000H
+ORG 0000H                  ; Define a origem do programa no endereço 0000H
 
 ; Definições dos pinos
-REGISTRADOR_SELECT    EQU    P1.3
-PINO_ATIVAR           EQU    P1.2
+REGISTRADOR_SELECT    EQU P1.3   ; Define o pino P1.3 como REGISTRADOR_SELECT
+PINO_ATIVAR           EQU P1.2   ; Define o pino P1.2 como PINO_ATIVAR
 
 InicioProg:
-    Clr REGISTRADOR_SELECT        
-    Call InicializarTela    
-    Call ConfigurarTela    
-    Call ConfigEntrada        
-    SetB REGISTRADOR_SELECT        
-    Mov DPTR,#TabelaMensagens
-    
+    Clr REGISTRADOR_SELECT       ; Limpa o bit REGISTRADOR_SELECT (modo comando)
+    Call InicializarTela         ; Chama a sub-rotina para inicializar a tela
+    Call ConfigurarTela          ; Chama a sub-rotina para configurar a tela
+    Call ConfigEntrada           ; Chama a sub-rotina para configurar a entrada
+    SetB REGISTRADOR_SELECT      ; Define REGISTRADOR_SELECT (modo dados)
+    Mov DPTR, #TabelaMensagens   ; Carrega o endereço da TabelaMensagens em DPTR
+
 LoopPrincipal:
-    Clr A
-    Movc A,@A+DPTR    
-    Jz ProximaSecao        
-    Call EnviarCaractere    
-    Inc DPTR        
-    Jmp LoopPrincipal
+    Clr A                        ; Limpa o acumulador A
+    Movc A, @A+DPTR              ; Move o conteúdo apontado por DPTR para A
+    Jz ProximaSecao              ; Se A for zero, pula para ProximaSecao
+    Call EnviarCaractere         ; Chama a sub-rotina para enviar o caractere
+    Inc DPTR                     ; Incrementa DPTR para o próximo caractere
+    Jmp LoopPrincipal            ; Volta para o início do LoopPrincipal
 
 ProximaSecao:
-    Mov R4,#00h    
-    Mov R5,#00h    
-    Mov DPTR,#CodigoSeguro    
+    Mov R4, #00h                 ; Inicializa o registrador R4 com 0
+    Mov R5, #00h                 ; Inicializa o registrador R5 com 0
+    Mov DPTR, #CodigoSeguro      ; Carrega o endereço de CodigoSeguro em DPTR
 
 LoopEntrada:
-    Call LerTeclado    
-    SetB REGISTRADOR_SELECT        
-    Clr A
-    Mov A,#'@'        
-    Call EnviarCaractere    
-    
-    Clr A
-    Movc A,@A+DPTR    
-    Call ValidarEntrada    
-    Inc DPTR
-    Inc R4
-    Cjne R4,#04h,LoopEntrada
-    
-    Cjne R5,#04h,AcessoNegado    
+    Call LerTeclado              ; Chama a sub-rotina para ler o teclado
+    SetB REGISTRADOR_SELECT      ; Define REGISTRADOR_SELECT (modo dados)
+    Clr A                        ; Limpa o acumulador A
+    Mov A, #'@'                  ; Move o caractere '@' para A
+    Call EnviarCaractere         ; Envia o caractere '@' para a tela
+
+    Clr A                        ; Limpa o acumulador A
+    Movc A, @A+DPTR              ; Move o caractere atual do código seguro para A
+    Call ValidarEntrada          ; Chama a sub-rotina para validar a entrada
+    Inc DPTR                     ; Incrementa DPTR para o próximo caractere da senha
+    Inc R4                       ; Incrementa R4 (contador de dígitos inseridos)
+    Cjne R4, #04h, LoopEntrada   ; Compara R4 com 4; se diferente, continua no LoopEntrada
+
+    Cjne R5, #04h, AcessoNegado  ; Compara R5 com 4; se diferente, vai para AcessoNegado
 
 AcessoPermitido:
-    Call PosicionarCursor
-    SetB REGISTRADOR_SELECT        
-    Call MostrarPermitido
-    SETB P3.0 
-    CLR P3.1 
-    
-    MOV R6, #0 
-    MOV R7, #200      
-    
+    Call PosicionarCursor        ; Posiciona o cursor na tela
+    SetB REGISTRADOR_SELECT      ; Define REGISTRADOR_SELECT (modo dados)
+    Call MostrarPermitido        ; Mostra a mensagem de acesso permitido
+    SETB P3.0                    ; Ativa o pino P3.0 (por exemplo, abre o cofre)
+    CLR P3.1                     ; Desativa o pino P3.1
+
+    MOV R6, #0                   ; Inicializa R6 com 0
+    MOV R7, #200                 ; Carrega 200 em R7 para temporização
+
 ContadorTempo:
-    DJNZ R7, ContadorTempo 
-    CLR P3.0 
-    Jmp ProximaSecao
+    DJNZ R7, ContadorTempo       ; Decrementa R7; se não zero, repete
+    CLR P3.0                     ; Desativa P3.0 (fecha o cofre)
+    Jmp ProximaSecao             ; Volta para ProximaSecao
 
 AcessoNegado:
-    Call PosicionarCursor
-    SetB REGISTRADOR_SELECT        
-    Call MostrarNegado
-    Jmp ProximaSecao
-                
+    Call PosicionarCursor        ; Posiciona o cursor na tela
+    SetB REGISTRADOR_SELECT      ; Define REGISTRADOR_SELECT (modo dados)
+    Call MostrarNegado           ; Mostra a mensagem de acesso negado
+    Jmp ProximaSecao             ; Volta para ProximaSecao
+
 InicializarTela:
-    Clr  P1.7        
-    Clr  P1.6        
-    SetB P1.5        
-    Clr  P1.4    
-    
-    Call AtivarPino
-    Call Esperar        
-    Call AtivarPino
-                    
-    SetB P1.7        
-    Clr  P1.6
-    Clr  P1.5
-    Clr  P1.4
-        
-    Call AtivarPino
-    Call Esperar
-    Ret
+    Clr P1.7                     ; Configura os pinos para inicialização da tela
+    Clr P1.6
+    SetB P1.5
+    Clr P1.4
+
+    Call AtivarPino              ; Ativa o pino para enviar o comando
+    Call Esperar                 ; Aguarda um tempo
+    Call AtivarPino              ; Ativa novamente o pino
+
+    SetB P1.7                    ; Configura os pinos para finalizar a inicialização
+    Clr P1.6
+    Clr P1.5
+    Clr P1.4
+
+    Call AtivarPino              ; Ativa o pino
+    Call Esperar                 ; Aguarda
+    Ret                          ; Retorna da sub-rotina
 
 ConfigurarTela:
-    Clr P1.7        
-    Clr P1.6        
-    Clr P1.5        
-    Clr P1.4      
-    Call AtivarPino
-    SetB P1.7        
-    SetB P1.6        
-    SetB P1.5        
-    SetB P1.4        
-    Call AtivarPino
-    Call Esperar            
-    Ret
+    Clr P1.7                     ; Configura os pinos para configuração da tela
+    Clr P1.6
+    Clr P1.5
+    Clr P1.4
+    Call AtivarPino              ; Ativa o pino
+    SetB P1.7                    ; Configura os pinos
+    SetB P1.6
+    SetB P1.5
+    SetB P1.4
+    Call AtivarPino              ; Ativa o pino
+    Call Esperar                 ; Aguarda
+    Ret                          ; Retorna
 
 ConfigEntrada:
-    Clr P1.7        
-    Clr P1.6        
-    Clr P1.5        
-    Clr P1.4        
-    Call AtivarPino
-    Clr  P1.7        
-    SetB P1.6        
-    SetB P1.5        
-    Clr  P1.4        
-    Call AtivarPino
-    Call Esperar        
-    Ret
-    
+    Clr P1.7                     ; Configura os pinos para entrada de dados
+    Clr P1.6
+    Clr P1.5
+    Clr P1.4
+    Call AtivarPino              ; Ativa o pino
+    Clr P1.7
+    SetB P1.6
+    SetB P1.5
+    Clr P1.4
+    Call AtivarPino              ; Ativa o pino
+    Call Esperar                 ; Aguarda
+    Ret                          ; Retorna
+
 AtivarPino:
-    SetB PINO_ATIVAR        
-    Clr  PINO_ATIVAR        
-    Ret
-    
+    SetB PINO_ATIVAR             ; Ativa o pino de ativação
+    Clr PINO_ATIVAR              ; Desativa o pino de ativação
+    Ret                          ; Retorna
+
 EnviarCaractere:
-    Mov C, ACC.7        
-    Mov P1.7, C        
-    Mov C, ACC.6        
-    Mov P1.6, C        
-    Mov C, ACC.5        
-    Mov P1.5, C        
-    Mov C, ACC.4        
-    Mov P1.4, C        
-    Call AtivarPino
-    Mov C, ACC.3        
-    Mov P1.7, C        
-    Mov C, ACC.2        
-    Mov P1.6, C        
-    Mov C, ACC.1        
-    Mov P1.5, C        
-    Mov C, ACC.0        
-    Mov P1.4, C        
-    Call AtivarPino
-    Call Esperar        
-    Mov R1,#45h        
-    Ret
-        
+    Mov C, ACC.7                 ; Move o bit 7 do acumulador para o carry
+    Mov P1.7, C                  ; Move o carry para o pino P1.7
+    Mov C, ACC.6                 ; Repete para os bits 6 a 0
+    Mov P1.6, C
+    Mov C, ACC.5
+    Mov P1.5, C
+    Mov C, ACC.4
+    Mov P1.4, C
+    Call AtivarPino              ; Ativa o pino para enviar os bits altos
+    Mov C, ACC.3                 ; Move os bits baixos
+    Mov P1.7, C
+    Mov C, ACC.2
+    Mov P1.6, C
+    Mov C, ACC.1
+    Mov P1.5, C
+    Mov C, ACC.0
+    Mov P1.4, C
+    Call AtivarPino              ; Ativa o pino para enviar os bits baixos
+    Call Esperar                 ; Aguarda
+    Mov R1, #45h                 ; Carrega 45h em R1 (pode ser usado como delay)
+    Ret                          ; Retorna
+
 Esperar:
-    Mov R0, #45        
-    Djnz R0, $
-    Ret
-            
+    Mov R0, #45                  ; Carrega 45 em R0
+DelayLoop:
+    Djnz R0, DelayLoop           ; Decrementa R0 até zero
+    Ret                          ; Retorna
+
 LerTeclado:
-    CLR P0.3            
-    CALL LerLinha0        
-    SetB P0.3            
-    JB F0,FimTeclado
-                    
-    CLR P0.2            
-    CALL LerLinha1        
-    SetB P0.2            
-    JB F0,FimTeclado
-                    
-    CLR P0.1            
-    CALL LerLinha2        
-    SetB P0.1            
-    JB F0,FimTeclado                        
-    CLR P0.0            
-    CALL LerLinha3        
-    SetB P0.0            
-    JB F0,FimTeclado                        
-    JMP LerTeclado                            
-                        
+    CLR P0.3                     ; Ativa a linha 0 do teclado
+    CALL LerLinha0               ; Lê as teclas da linha 0
+    SetB P0.3                    ; Desativa a linha 0
+    JB F0, FimTeclado            ; Se F0 estiver setado, tecla foi detectada
+
+    CLR P0.2                     ; Repete para as linhas 1 a 3
+    CALL LerLinha1
+    SetB P0.2
+    JB F0, FimTeclado
+
+    CLR P0.1
+    CALL LerLinha2
+    SetB P0.1
+    JB F0, FimTeclado
+
+    CLR P0.0
+    CALL LerLinha3
+    SetB P0.0
+    JB F0, FimTeclado
+
+    JMP LerTeclado               ; Continua lendo o teclado
+
 FimTeclado:
-    Clr F0                
-    Ret
+    Clr F0                       ; Limpa a flag F0
+    Ret                          ; Retorna
 
 LerLinha0:
-    JNB P0.4, Tecla03    
-    JNB P0.5, Tecla13    
-    JNB P0.6, Tecla23    
-    RET                    
+    JNB P0.4, Tecla03            ; Verifica se a tecla 3 foi pressionada
+    JNB P0.5, Tecla13            ; Verifica se a tecla 2 foi pressionada
+    JNB P0.6, Tecla23            ; Verifica se a tecla 1 foi pressionada
+    RET                          ; Retorna se nenhuma tecla foi detectada
 
 Tecla03:
-    SETB F0            
-    Mov R7,#'3'        
-    RET                
+    SETB F0                      ; Seta a flag F0 indicando tecla detectada
+    Mov R7, #'3'                 ; Armazena '3' em R7
+    RET                          ; Retorna
 
 Tecla13:
-    SETB F0            
-    Mov R7,#'2'        
-    RET                
+    SETB F0
+    Mov R7, #'2'
+    RET
 
 Tecla23:
-    SETB F0            
-    Mov R7,#'1'        
-    RET                
+    SETB F0
+    Mov R7, #'1'
+    RET
 
 LerLinha1:
-    JNB P0.4, Tecla02    
-    JNB P0.5, Tecla12    
-    JNB P0.6, Tecla22    
-    RET                    
+    JNB P0.4, Tecla02            ; Repete para outras linhas e teclas
+    JNB P0.5, Tecla12
+    JNB P0.6, Tecla22
+    RET
 
 Tecla02:
-    SETB F0            
-    Mov R7,#'6'        
-    RET                
+    SETB F0
+    Mov R7, #'6'
+    RET
 
 Tecla12:
-    SETB F0            
-    Mov R7,#'5'        
-    RET                
+    SETB F0
+    Mov R7, #'5'
+    RET
 
 Tecla22:
-    SETB F0            
-    Mov R7,#'4'        
-    RET                
+    SETB F0
+    Mov R7, #'4'
+    RET
 
 LerLinha2:
-    JNB P0.4, Tecla01    
-    JNB P0.5, Tecla11    
-    JNB P0.6, Tecla21    
-    RET                    
+    JNB P0.4, Tecla01
+    JNB P0.5, Tecla11
+    JNB P0.6, Tecla21
+    RET
 
 Tecla01:
-    SETB F0            
-    Mov R7,#'9'        
-    RET                
+    SETB F0
+    Mov R7, #'9'
+    RET
 
 Tecla11:
-    SETB F0            
-    Mov R7,#'8'        
-    RET                
+    SETB F0
+    Mov R7, #'8'
+    RET
 
 Tecla21:
-    SETB F0            
-    Mov R7,#'7'        
-    RET                
+    SETB F0
+    Mov R7, #'7'
+    RET
 
 LerLinha3:
-    JNB P0.4, Tecla00    
-    JNB P0.5, Tecla10    
-    JNB P0.6, Tecla20    
-    RET                    
+    JNB P0.4, Tecla00
+    JNB P0.5, Tecla10
+    JNB P0.6, Tecla20
+    RET
 
 Tecla00:
-    SETB F0            
-    Mov R7,#'#'        
-    RET                
+    SETB F0
+    Mov R7, #'#'
+    RET
 
 Tecla10:
-    SETB F0            
-    Mov R7,#'0'        
-    RET                
+    SETB F0
+    Mov R7, #'0'
+    RET
 
 Tecla20:
-    SETB F0            
-    Mov R7,#'@'        
-    RET        
+    SETB F0
+    Mov R7, #'@'
+    RET
 
-ValidarEntrada:    
-    Cjne A,07H,SairValidacao    
-    Inc R5
-SairValidacao:                    
-    Ret
+ValidarEntrada:
+    Cjne A, 07H, SairValidacao   ; Compara A com 07H ('@'); se diferente, sai
+    Inc R5                       ; Incrementa R5 se a entrada for correta
+SairValidacao:
+    Ret                          ; Retorna
 
-PosicionarCursor:    
-    Clr REGISTRADOR_SELECT
-    SetB P1.7        
-    SetB P1.6        
-    Clr P1.5                                             
-    Clr P1.4                                             
-    Call AtivarPino
-    Clr P1.7                                             
-    Clr P1.6                                             
-    Clr P1.5                                             
-    Clr P1.4                                             
-    Call AtivarPino
-    Call Esperar            
-    Ret    
+PosicionarCursor:
+    Clr REGISTRADOR_SELECT       ; Modo comando para posicionar cursor
+    SetB P1.7                    ; Configura os pinos para o comando
+    SetB P1.6
+    Clr P1.5
+    Clr P1.4
+    Call AtivarPino              ; Ativa o pino
+    Clr P1.7
+    Clr P1.6
+    Clr P1.5
+    Clr P1.4
+    Call AtivarPino              ; Ativa o pino
+    Call Esperar                 ; Aguarda
+    Ret                          ; Retorna
 
-MostrarPermitido:    
-    Mov DPTR,#MensagemPermitido        
-LoopPermitido:    
+MostrarPermitido:
+    Mov DPTR, #MensagemPermitido ; Carrega o endereço da mensagem de permitido
+LoopPermitido:
+    Clr A                        ; Limpa o acumulador A
+    Movc A, @A+DPTR              ; Carrega o próximo caractere
+    Jz VoltarInicio              ; Se zero, fim da mensagem
+    Call EnviarCaractere         ; Envia o caractere
+    Inc DPTR                     ; Incrementa DPTR
+    Jmp LoopPermitido            ; Repete até o fim da mensagem
+
+MostrarNegado:
+    Mov DPTR, #MensagemNegado    ; Carrega o endereço da mensagem de negado
+LoopNegado:
     Clr A
-    Movc A,@A+DPTR
+    Movc A, @A+DPTR
     Jz VoltarInicio
     Call EnviarCaractere
     Inc DPTR
-    Jmp LoopPermitido        
-
-MostrarNegado:        
-    Mov DPTR,#MensagemNegado        
-LoopNegado:    
-    Clr A
-    Movc A,@A+DPTR
-    Jz VoltarInicio
-    Call EnviarCaractere
-    Inc DPTR    
     Jmp LoopNegado
 
-VoltarInicio:    
-    Ret    
+VoltarInicio:
+    Ret                          ; Retorna
 
-; Mensagens corrigidas
-TabelaMensagens:     DB 'D','I','G','I','T','E',':',0
-MensagemPermitido:   DB 'C','O','F','R','E',' ','A','B','E','R','T','O','!',0
-MensagemNegado:      DB 'C','O','F','R','E',' ','F','E','C','H','A','D','O','!',0
-CodigoSeguro:        DB '4','5','7','2',0    ; Senha: 4572
+; Mensagens armazenadas na memória
+TabelaMensagens:     DB 'D','I','G','I','T','E',':',0       ; Mensagem "DIGITE:"
+MensagemPermitido:   DB 'C','O','F','R','E',' ','A','B','E','R','T','O','!',0  ; "COFRE ABERTO!"
+MensagemNegado:      DB 'C','O','F','R','E',' ','F','E','C','H','A','D','O','!',0  ; "COFRE FECHADO!"
+CodigoSeguro:        DB '4','5','7','2',0                   ; Senha: "4572"
 
-End
+End                            ; Fim do programa
+        
+  
