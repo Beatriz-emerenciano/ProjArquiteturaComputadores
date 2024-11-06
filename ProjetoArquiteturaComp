@@ -170,4 +170,36 @@ LerLinha0:
     JNB P0.4, Tecla03    
     JNB P0.5, Tecla13    
     JNB P0.6, Tecla23    
-    RET         
+    RET   
+
+Tecla03:
+    SETB F0            
+    Mov R7,#'3'        
+    RET                
+
+Tecla13:
+    SETB F0            
+    Mov R7,#'2'        
+    RET                
+
+Tecla23:
+    SETB F0            
+    Mov R7,#'1'        
+    RET                
+
+LerLinha1:
+    JNB P0.4, Tecla02    
+    JNB P0.5, Tecla12    
+    JNB P0.6, Tecla22    
+    RET                    
+
+Tecla02:
+    SETB F0            
+    Mov R7,#'6'        
+    RET                
+
+Tecla12:
+    SETB F0            
+    Mov R7,#'5'        
+    RET                
+
