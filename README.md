@@ -35,9 +35,10 @@ Utilizando um teclado matricial para inserção do PIN e um display LCD para exi
 
 # Execução do Projeto
 
-** Fluxograma 
+**Fluxograma:** 
 
-![Minha Imagem](Downloads/organograma.jpeg)
+![image](https://github.com/user-attachments/assets/84bed68e-d983-479b-9692-22234bc4b423)
+
 
 
 **Frequência Recomendada para Testes:**
