@@ -37,7 +37,7 @@ Utilizando um teclado matricial para inserção do PIN e um display LCD para exi
 
 ** Fluxograma 
 
-![Minha Imagem](Downloads/diagrama.jpeg)
+![Minha Imagem](Downloads/organograma.jpeg)
 
 
 **Frequência Recomendada para Testes:**
