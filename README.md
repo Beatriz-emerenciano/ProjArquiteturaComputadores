@@ -72,6 +72,19 @@ Utilizando um teclado matricial para inserção do PIN e um display LCD para exi
 - A função VerificarEntrada verifica cada tecla pressionada em busca de inconsistências.
 - Se algum dígito não corresponder, a função Negado é chamada para negar o acesso e informar o usuário.
 
+# Tela
+**Cofre Aberto**
+![image](https://github.com/user-attachments/assets/8e975278-0e97-4923-b0c8-b76ddf6ac269)
+
+**Cofre Fechado**
+![image](https://github.com/user-attachments/assets/1eebd604-c2ef-4a47-8aa6-6ff1d05874e3)
+
+# Fontes de Referência
+- chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://web.mit.edu/6.115/www/document/8051.pdf
+- https://www.youtube.com/@canalwrkits
+- file:///C:/Users/Jo%C3%A3o/Downloads/examples-1%20(1).pdf
+
+
 
 
 
