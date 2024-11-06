@@ -11,15 +11,15 @@ Utilizando um teclado matricial para inserção do PIN e um display LCD para exi
 
 # Funcionalidades
 
--Entrada de Senha via Teclado Matricial: O usuário pode inserir uma senha utilizando um teclado matricial 4x4 conectado ao microcontrolador.
+- Entrada de Senha via Teclado Matricial: O usuário pode inserir uma senha utilizando um teclado matricial 4x4 conectado ao microcontrolador.
 
--Exibição Dinâmica no Display LCD: Mensagens e instruções são apresentadas em um display LCD conforme as interações do usuário. O sistema utiliza tabelas de consulta (LUTs) para facilitar a gestão e exibição dos textos.
+- Exibição Dinâmica no Display LCD: Mensagens e instruções são apresentadas em um display LCD conforme as interações do usuário. O sistema utiliza tabelas de consulta (LUTs) para facilitar a gestão e exibição dos textos.
 
--Verificação e Autenticação da Senha: O microcontrolador verifica se a senha digitada corresponde à senha armazenada, validando o acesso.
+- Verificação e Autenticação da Senha: O microcontrolador verifica se a senha digitada corresponde à senha armazenada, validando o acesso.
 
--Feedback Visual ao Usuário: O display LCD fornece feedback imediato, indicando se o acesso foi autorizado ou negado, melhorando a experiência do usuário.
+- Feedback Visual ao Usuário: O display LCD fornece feedback imediato, indicando se o acesso foi autorizado ou negado, melhorando a experiência do usuário.
 
--Opção de Alteração de Senha: Após uma autenticação bem-sucedida, o usuário tem a opção de pressionar o botão "#" para modificar a senha de acesso do sistema.
+- Opção de Alteração de Senha: Após uma autenticação bem-sucedida, o usuário tem a opção de pressionar o botão "#" para modificar a senha de acesso do sistema.
 
 # Perifericos  
 
