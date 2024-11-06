@@ -29,6 +29,7 @@ Utilizando um teclado matricial para inserção do PIN e um display LCD para exi
 - Microcontrolador 8051
 - Teclado Matricial 4x4
 - Display LCD
+- Motor
 
 **Para simular todos os perifericos do projeto, foi utilizado no emulador Edsim51.**
 
