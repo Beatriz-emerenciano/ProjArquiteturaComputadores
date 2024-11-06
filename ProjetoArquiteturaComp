@@ -136,6 +136,7 @@ EnviarCaractere:
     Call Esperar        
     Mov R1,#45h        
     Ret
+        
 Esperar:
     Mov R0, #45        
     Djnz R0, $
@@ -170,7 +171,7 @@ LerLinha0:
     JNB P0.4, Tecla03    
     JNB P0.5, Tecla13    
     JNB P0.6, Tecla23    
-    RET   
+    RET                    
 
 Tecla03:
     SETB F0            
@@ -202,6 +203,7 @@ Tecla12:
     SETB F0            
     Mov R7,#'5'        
     RET                
+
 Tecla22:
     SETB F0            
     Mov R7,#'4'        
@@ -289,6 +291,7 @@ LoopNegado:
     Call EnviarCaractere
     Inc DPTR    
     Jmp LoopNegado
+
 VoltarInicio:    
     Ret    
 
