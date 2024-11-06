@@ -31,7 +31,7 @@ Utilizando um teclado matricial para inserção do PIN e um display LCD para exi
 - Display LCD
 - Motor
 
-**Para simular todos os perifericos do projeto, foi utilizado no emulador Edsim51.**
+**Para simular todos os perifericos do projeto, foi utilizado o emulador Edsim51.**
 
 # Execução do Projeto
 
