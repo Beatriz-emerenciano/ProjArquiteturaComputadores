@@ -47,7 +47,7 @@ Utilizando um teclado matricial para inserção do PIN e um display LCD para exi
 - Antes de inserir dados no teclado, ajuste a frequência para 10 Hz.
 - Frequências mais altas podem causar problemas de múltiplas entradas no teclado matricial.
 
-- 
+  
 
  **Processo Quando o PIN é Solicitado:** 
 
