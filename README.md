@@ -80,7 +80,7 @@ Utilizando um teclado matricial para inserção do PIN e um display LCD para exi
 ![image](https://github.com/user-attachments/assets/1eebd604-c2ef-4a47-8aa6-6ff1d05874e3)
 
 # Fontes de Referência
-- chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://web.mit.edu/6.115/www/document/8051.pdf
+- https://web.mit.edu/6.115/www/document/8051.pdf
 - https://www.youtube.com/@canalwrkits
 - file:///C:/Users/Jo%C3%A3o/Downloads/examples-1%20(1).pdf
 
