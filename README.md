@@ -1,6 +1,6 @@
 
 
-# Desenvolvimento de Fechadura Eletrônica com Senha em Assembly para Microcontrolador 8051
+# Fechadura Eletrônica em Assembly 
 
 Este projeto envolve a criação de uma interface que integra um teclado matricial, um display LCD e um motor que simula o funcionamento de uma fechadura. 
 Tudo é controlado por um microcontrolador programado na linguagem Assembly, proporcionando um sistema de acesso seguro por senha.
