@@ -82,8 +82,7 @@ Utilizando um teclado matricial para inserção do PIN e um display LCD para exi
 # Fontes de Referência
 - https://web.mit.edu/6.115/www/document/8051.pdf
 - https://www.youtube.com/@canalwrkits
-- file:///C:/Users/Jo%C3%A3o/Downloads/examples-1%20(1).pdf
-
+- https://edsim51.com/examples/
 
 
 
