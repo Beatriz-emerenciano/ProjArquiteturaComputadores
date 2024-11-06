@@ -136,3 +136,38 @@ EnviarCaractere:
     Call Esperar        
     Mov R1,#45h        
     Ret
+Esperar:
+    Mov R0, #45        
+    Djnz R0, $
+    Ret
+            
+LerTeclado:
+    CLR P0.3            
+    CALL LerLinha0        
+    SetB P0.3            
+    JB F0,FimTeclado
+                    
+    CLR P0.2            
+    CALL LerLinha1        
+    SetB P0.2            
+    JB F0,FimTeclado
+                    
+    CLR P0.1            
+    CALL LerLinha2        
+    SetB P0.1            
+    JB F0,FimTeclado                        
+    CLR P0.0            
+    CALL LerLinha3        
+    SetB P0.0            
+    JB F0,FimTeclado                        
+    JMP LerTeclado                            
+                        
+FimTeclado:
+    Clr F0                
+    Ret
+
+LerLinha0:
+    JNB P0.4, Tecla03    
+    JNB P0.5, Tecla13    
+    JNB P0.6, Tecla23    
+    RET         
